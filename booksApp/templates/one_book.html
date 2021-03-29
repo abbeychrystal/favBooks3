@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Favorite Books</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class='container'>
+        <div class="row">
+            <h1>Welcome, {{current_user.first_name}}</h1>
+        </div>
+        <div class="row">
+            <a href="/logout"> Logout </a>
+        </div>
+        <div class="row">
+            <a href="/books/main_page"> Back </a>
+        </div>
+        <div class="row">
+            <div class="col-6 px-2">
+                {% if messages %}
+                <ul class="messages">    
+                    {% for message in messages %}    
+                        <li>{{ message }}</li>    
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                
+                {% if current_user.id == one_book.added_by.id %}
+                    <form action="/books/{{one_book.id}}/update" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type='text' name='title' placeholder='{{one_book.title}}'>
+                        </div>
+                        <p>Added by: {{one_book.added_by.first_name}} {{one_book.added_by.last_name}}</p>
+                        <p>Added on: {{one_book.created_at}}</p>
+                        <p>Last updated at: {{one_book.updated_at}}</p>
+                        <div class="form-group">
+                            <label>Description: 
+                                <textarea name='description' placeholder='{{one_book.description}}'></textarea>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                    <form action="/books/{{one_book.id}}/delete" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group"><button type="submit" class="btn btn-danger">Delete</button></div>
+                    </form>
+                {% else %}
+                    <h2>{{one_book.title}}</h2>
+                    <p>Added by: {{one_book.added_by.first_name}} {{one_book.added_by.last_name}}</p>
+                    <p>Added on: {{one_book.created_at}}</p>
+                    <p>Last updated at: {{one_book.updated_at}}</p>
+                    <p>Description: {{one_book.description}}</p>
+                {% endif %}
+            </div>
+            <div class="col-6 px-2">
+                <h2>Users who Favorited This Book</h2>
+                <ul>
+                    {% for each_liker in one_book.favorited_by.all %}
+                        <li>{{each_liker.first_name}} {{each_liker.last_name}}</li>
+                    {% endfor %}
+                </ul>    
+                {% if current_user in one_book.favorited_by.all %}
+                    <a href="/books/{{one_book.id}}/unfavorite" role="button" class="btn btn-warning">Un-Favorite "{{one_book.title}}"</a>
+                {% else %}
+                    <a href="/books/{{one_book.id}}/favorite" role="button" class="btn btn-primary">Add to Favorites</a>
+                {% endif %}
+                <br>
+                <br>
+                <br>
+                
+            </div>
+                
+        </div>
+    </div> 
+</body>
